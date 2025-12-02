@@ -470,45 +470,77 @@
 
                 // 狀況1: 疊字 (11, 22)
                 if (d1 === d2) {
-                    // 需要兩個四角柱（骰子）都有這個數字
                     if (!hasA_d1 || !hasB_d1) {
-                        return `<span class="text-sm text-orange-700 mt-2 inline-block bg-orange-100 px-2 py-1 rounded">💡 提示：要排出 <strong>${str}</strong>，兩個四角柱（骰子）<strong class="text-red-600">都必須</strong>要有數字 ${d1} 喔！</span>`;
+                        return `<span class="text-base text-orange-700 mt-2 inline-block bg-orange-100 px-3 py-2 rounded-lg">
+                            💡 <strong>想排出 ${str}：</strong><br>
+                            兩個四角柱<strong class="text-red-600">都要有</strong>數字 ${d1} 才行喔！
+                        </span>`;
                     }
                 }
 
-                // 狀況2: 不同數字 (01, 25)
-                // 檢查是否有數字完全缺失
+                // 狀況2: 數字完全缺失
                 const d1_avail = hasA_d1 || hasB_d1;
                 const d2_avail = hasA_d2 || hasB_d2;
                 
-                if (!d1_avail) return `<span class="text-sm text-orange-700 mt-2 inline-block bg-orange-100 px-2 py-1 rounded">💡 提示：你兩個四角柱（骰子）都沒有數字 <strong>${d1}</strong>，這樣排不出 ${str} 喔！</span>`;
-                if (!d2_avail) return `<span class="text-sm text-orange-700 mt-2 inline-block bg-orange-100 px-2 py-1 rounded">💡 提示：你兩個四角柱（骰子）都沒有數字 <strong>${d2}</strong>，這樣排不出 ${str} 喔！</span>`;
+                if (!d1_avail) return `<span class="text-base text-orange-700 mt-2 inline-block bg-orange-100 px-3 py-2 rounded-lg">💡 <strong>找找看：</strong><br>你的四角柱上好像少了數字 <strong>${d1}</strong> 耶！</span>`;
+                if (!d2_avail) return `<span class="text-base text-orange-700 mt-2 inline-block bg-orange-100 px-3 py-2 rounded-lg">💡 <strong>找找看：</strong><br>你的四角柱上好像少了數字 <strong>${d2}</strong> 耶！</span>`;
 
-                // 狀況3: 數字都在同一個四角柱（骰子）上
-                // 例如 A 有 0, 8，但 B 沒有，要排 08 就排不出來
+                // 狀況3: 數字都在同一個四角柱上 (撞車了)
                 if (hasA_d1 && hasA_d2 && !hasB_d1 && !hasB_d2) {
-                    return `<span class="text-sm text-orange-700 mt-2 inline-block bg-orange-100 px-2 py-1 rounded">💡 提示：數字 <strong>${d1}</strong> 和 <strong>${d2}</strong> 都在四角柱（骰子） A，但四角柱（骰子） B 沒辦法配合！試著把其中一個移到四角柱（骰子） B？</span>`;
+                    // 特別優化：如果問題出在 0，提示「需要兩個 0」而不是「移動」
+                    if (d1 === '0' || d2 === '0') {
+                         return `<span class="text-base text-orange-700 mt-2 inline-block bg-orange-100 px-3 py-2 rounded-lg">
+                            💡 <strong>小發現：</strong><br>
+                            數字 0 常常用到 (像 01~09, 10, 20...)。<br>
+                            也許<strong>兩個四角柱都要有 0</strong> 喔？
+                        </span>`;
+                    }
+                    // 一般數字：建議移動
+                    return `<span class="text-base text-orange-700 mt-2 inline-block bg-orange-100 px-3 py-2 rounded-lg">
+                        💡 <strong>分工合作：</strong><br>
+                        數字 <strong>${d1}</strong> 和 <strong>${d2}</strong> 都在四角柱 A，<br>
+                        試著把其中一個<strong>移到四角柱 B</strong>？
+                    </span>`;
                 }
                 if (hasB_d1 && hasB_d2 && !hasA_d1 && !hasA_d2) {
-                    return `<span class="text-sm text-orange-700 mt-2 inline-block bg-orange-100 px-2 py-1 rounded">💡 提示：數字 <strong>${d1}</strong> 和 <strong>${d2}</strong> 都在四角柱（骰子） B，但四角柱（骰子） A 沒辦法配合！試著把其中一個移到四角柱（骰子） A？</span>`;
+                    // 特別優化：如果問題出在 0，提示「需要兩個 0」
+                    if (d1 === '0' || d2 === '0') {
+                         return `<span class="text-base text-orange-700 mt-2 inline-block bg-orange-100 px-3 py-2 rounded-lg">
+                            💡 <strong>小發現：</strong><br>
+                            數字 0 常常用到 (像 01~09, 10, 20...)。<br>
+                            也許<strong>兩個四角柱都要有 0</strong> 喔？
+                        </span>`;
+                    }
+                    // 一般數字：建議移動
+                    return `<span class="text-base text-orange-700 mt-2 inline-block bg-orange-100 px-3 py-2 rounded-lg">
+                        💡 <strong>分工合作：</strong><br>
+                        數字 <strong>${d1}</strong> 和 <strong>${d2}</strong> 都在四角柱 B，<br>
+                        試著把其中一個<strong>移到四角柱 A</strong>？
+                    </span>`;
                 }
 
                 // 狀況4: 通用提示
-                return `<span class="text-sm text-orange-700 mt-2 inline-block bg-orange-100 px-2 py-1 rounded">💡 提示：要排出 ${str}，需要一個四角柱（骰子）出 ${d1}，另一個出 ${d2}。檢查一下你的數字分配？</span>`;
+                return `<span class="text-base text-orange-700 mt-2 inline-block bg-orange-100 px-3 py-2 rounded-lg">
+                    💡 <strong>想排出 ${str}：</strong><br>
+                    需要一邊出 ${d1}，另一邊出 ${d2}。<br>
+                    檢查一下數字位置？
+                </span>`;
             }
 
-            // 檢查是否需要顯示 6/9 提示
-            function shouldShowFlipHint(dateStr, cA, cB) {
+            // 檢查是否需要顯示 6/9 提示，並回傳提示類型
+            function getFlipHintType(dateStr, cA, cB) {
                 const hasStrict9 = cA.includes(9) || cB.includes(9);
                 const hasStrict6 = cA.includes(6) || cB.includes(6);
 
-                // 如果題目有 9，但玩家沒有 9，可是有 6 -> 提示可以用 6
-                if (dateStr.includes('9') && !hasStrict9 && hasStrict6) return true;
+                // 如果題目有 9，但玩家沒有 9，可是有 6 -> 提示可以用 6 當 9
+                // 玩家需要 9，所以提示「其實已包括數字 9」
+                if (dateStr.includes('9') && !hasStrict9 && hasStrict6) return 'need9';
                 
-                // 如果題目有 6，但玩家沒有 6，可是有 9 -> 提示可以用 9
-                if (dateStr.includes('6') && !hasStrict6 && hasStrict9) return true;
+                // 如果題目有 6，但玩家沒有 6，可是有 9 -> 提示可以用 9 當 6
+                // 玩家需要 6，所以提示「其實已包括數字 6」
+                if (dateStr.includes('6') && !hasStrict6 && hasStrict9) return 'need6';
 
-                return false;
+                return null;
             }
 
             // --- 遊戲邏輯 ---
@@ -544,7 +576,7 @@
             function updateGame() {
                 const data = parseInputs();
                 if (!data) {
-                    setupFeedback.textContent = "⚠️ 請將所有格子填滿 0-9 的數字！";
+                    setupFeedback.textContent = "⚠️ 請把 12 個格子都填上數字喔！";
                     setupFeedback.className = "mt-4 text-sm text-red-600 font-bold";
                     return;
                 }
@@ -554,7 +586,7 @@
                 isConfigCorrect = validateConfiguration(playerCubeA, playerCubeB);
 
                 // UI 更新
-                setupFeedback.textContent = "✅ 設定已更新！請看右側挑戰。";
+                setupFeedback.textContent = "✅ 設定好了！請看右邊的挑戰。";
                 setupFeedback.className = "mt-4 text-sm text-green-600 font-bold";
                 gameOverlay.classList.add('hidden');
                 
@@ -753,11 +785,15 @@
             function handleHint() {
                 const str = currentTarget.toString().padStart(2, '0');
                 
-                // 6/9 提示邏輯 (使用更嚴格的判斷)
-                const showFlipHint = shouldShowFlipHint(str, playerCubeA, playerCubeB);
-                const hintHtml69 = showFlipHint 
-                    ? `<br><span class="text-sm font-bold text-gray-600 mt-2 inline-block bg-yellow-100 px-2 py-1 rounded">💡 提示：6 可以當 9 用，9 也可以當 6 用喔！</span>`
-                    : ``;
+                // 6/9 提示邏輯 (使用更嚴格的判斷並區分情況)
+                const flipType = getFlipHintType(str, playerCubeA, playerCubeB);
+                let hintHtml69 = '';
+
+                if (flipType === 'need9') {
+                    hintHtml69 = `<br><span class="text-base font-bold text-gray-700 mt-2 inline-block bg-yellow-100 px-3 py-2 rounded-lg">💡 其實你的四角柱已包括數字 9，看仔細一點！</span>`;
+                } else if (flipType === 'need6') {
+                    hintHtml69 = `<br><span class="text-base font-bold text-gray-700 mt-2 inline-block bg-yellow-100 px-3 py-2 rounded-lg">💡 其實你的四角柱已包括數字 6，看仔細一點！</span>`;
+                }
 
                 // 智慧提示邏輯
                 let smartHint = getSmartHint(currentTarget, playerCubeA, playerCubeB);
@@ -765,7 +801,7 @@
                 // 如果是無解的情況，加上修改建議
                 let modifyHint = "";
                 if (currentIsImpossible) {
-                    modifyHint = `<br><span class="text-sm font-medium text-blue-600 mt-2 inline-block">👉 請根據提示，去左邊<strong>修改你的數字</strong>試試看！</span>`;
+                    modifyHint = `<br><span class="text-base font-medium text-blue-700 mt-2 inline-block">👉 照著提示，去左邊<strong>修改你的數字</strong>再來挑戰！</span>`;
                 }
 
                 messageBox.innerHTML = smartHint + hintHtml69 + modifyHint;
@@ -779,7 +815,7 @@
                 }
 
                 if (selectionA === null || selectionB === null) {
-                    messageBox.textContent = "請選擇兩個四角柱（骰子）！";
+                    messageBox.textContent = "請選擇兩個四角柱！";
                     messageBox.className = "min-h-[4rem] text-lg font-bold mb-3 text-red-500 flex items-center justify-center flex-col";
                     return;
                 }
@@ -811,7 +847,7 @@
                     // --- 答錯了 ---
                     if (currentIsImpossible) {
                         // 題目本身無解
-                        messageBox.innerHTML = `<span class='text-red-600'>這題好像排不出來？</span><br><span class="text-sm font-normal text-gray-600">試試看按「💡 提示」！</span>`;
+                        messageBox.innerHTML = `<span class='text-red-600'>這題排不出來耶！</span><br><span class="text-base font-normal text-gray-600">按「💡 提示」看看怎麼辦？</span>`;
                     } else {
                         // 題目可解，但玩家選錯
                         messageBox.innerHTML = "這兩個數字不對喔，再試試看！";
